@@ -10,19 +10,20 @@ class Perceptron:
         _, p = X.shape
         Y_est = np.zeros(p)
         for i in range(p):
-            Y_est[i] = np.dot(self.w,X[:,i]) + self.b
-            if Y_est[i] >= 0:
+            y_est = np.dot(self.w,X[:,i]) + self.b
+            if y_est >= 0:
                 Y_est[i] = 1
             else:
                 Y_est[i] = 0
         return Y_est
+        
     def fit(self, X, Y, epochs = 100, lr = 0.1):
         _, p = X.shape
         for _ in range(epochs):
             for i in range(p):
-                yest = self.predict(X[:,i].reshape(-1,1))
-                self.w += lr * (Y[i] - yest) * X[:,i]
-                self.b += lr * (Y[i] - yest)
+                y_est = self.predict(X[:,i].reshape(-1,1))
+                self.w += lr * (Y[i] - y_est) * X[:,i]
+                self.b += lr * (Y[i] - y_est)
 
 
 # Ejemplo
@@ -37,8 +38,9 @@ model = Perceptron(2)
 #Datos
 
 X = np.array([[0,0,1,1],[0,1,0,1]])
-
-Y = np.array([0,0,0,1])
+# Y = np.array([0,1,1,1])  #OR gate
+# Y = np.array([0,0,0,1]) #AND gate
+Y = np.array([0,1,1,0]) #XOR gate  (no linealmente separable)
 
 model.fit(X,Y)
 
@@ -58,3 +60,4 @@ plt.ylim([-2,2])
 plt.xlabel('x1')
 plt.ylabel('x2')   
 draw_perceptron(model)
+plt.show()
