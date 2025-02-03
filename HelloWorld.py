@@ -78,3 +78,50 @@ plot_results(X, Y_xor, model_xor, 'Perceptrón - Compuerta XOR', axs[2])
 
 plt.tight_layout()
 plt.show()
+
+
+# Función para normalizar datos (min-max normalization)
+def normalize_data(X, X_min, X_max):
+    return (X - X_min) / (X_max - X_min)
+
+# 2.1 Crear datos aleatorios de personas (peso y altura)
+np.random.seed(42)  # Para reproducibilidad
+n_samples = 100
+peso = np.random.uniform(40, 120, n_samples)  # Peso en kg (entre 40 y 120 kg)
+altura = np.random.uniform(1.4, 2.0, n_samples)  # Altura en metros (entre 1.4 y 2.0 m)
+
+# Calcular IMC y determinar sobrepeso (etiquetas)
+imc = peso / altura**2
+Y = (imc >= 25).astype(int)  # 1 si tiene sobrepeso, 0 si no
+
+# 2.2 Normalizar los datos
+X = np.vstack((peso, altura))  # Unir peso y altura en una matriz
+X_min = X.min(axis=1, keepdims=True)
+X_max = X.max(axis=1, keepdims=True)
+X_norm = normalize_data(X, X_min, X_max)
+
+# 2.3 Entrenar el perceptrón
+model = Perceptron(2)
+model.fit(X_norm, Y, epochs=100, lr=0.1)
+
+
+# Predecir con el perceptrón
+predictions = model.predict(X_norm)
+
+# Graficar los datos y la neurona
+plt.scatter(X_norm[0, Y == 0], X_norm[1, Y == 0], c='blue', label='No sobrepeso')
+plt.scatter(X_norm[0, Y == 1], X_norm[1, Y == 1], c='red', label='Sobrepeso')
+
+
+# Dibujar la neurona
+w1, w2, b = model.w[0], model.w[1], model.b
+x_values = np.array([X_norm[0].min(), X_norm[0].max()])
+y_values = -(w1 * x_values + b) / w2
+plt.plot(x_values, y_values, '--k', label='Neurona')
+
+plt.xlabel('Peso normalizado')
+plt.ylabel('Altura normalizada')
+plt.title('Perceptrón - Sobrepeso')
+plt.legend()
+plt.grid(True)
+plt.show()
