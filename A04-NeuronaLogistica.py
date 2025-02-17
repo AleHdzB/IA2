@@ -11,12 +11,12 @@ class LogisticNeuron:
 
     def prediction_proba(self, x):
         Z = np.dot(self.w,X)+ self.b
-        Yest = 1 / (1+np.exp(-Z))
+        Yest = 1 / (1+np.exp(-Z)) # pylint: disable=runtime-warning
         return Yest
     
     def predict(self, X, umbral =0.5):
         Z = np.dot(self.w,X)+ self.b
-        Yest = 1 / (1+np.exp(-Z))
+        Yest = 1 / (1+np.exp(-Z))# pylint: disable=runtime-warning
         return 1 * (Yest >= umbral)
     def fit(self, X, Y, epochs=500, lr=0.01):
         p =  X.shape[1]
@@ -27,7 +27,7 @@ class LogisticNeuron:
 
 
 # Load dataset from CSV file
-file_path = 'C:/Users/AleHdzB/Downloads/diabetes.csv'
+file_path = './diabetes.csv'
 data = pd.read_csv(file_path)
 
 X = np.array(data.drop(columns='Outcome')).T
@@ -54,6 +54,6 @@ predictions = neuron.predict(X_normalized)
 
 accuracy = np.mean(predictions == Y)*100
 # Imprimir resultados
-print("Predicciones (probabilidades):", predictions_proba)
-print("Predicciones (clasificación):", predictions)
+# print("Predicciones (probabilidades):", predictions_proba)
+# print("Predicciones (clasificación):", predictions)
 print("Precisión:", round(accuracy), "%")
