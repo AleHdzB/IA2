@@ -84,24 +84,72 @@ def draw(X, Y, net):
 
     plt.xlim([-0.02, 1.02])
     plt.ylim([-0.02, 1.02])
-    plt.xlabel('x1 (Normalizado)')
-    plt.ylabel('x2 (Normalizado)')
-    plt.title('One Layer Neural Network')
+    plt.xlabel('x1 ')
+    plt.ylabel('x2 ')
+    plt.title('Clasificación Multiclase con Función Logística')
     # plt.legend()
     plt.grid(True)
     plt.show()
 
+
+def MLP_multiclass_draw(X, Y, net):
+    plt.figure(figsize=(8, 6))
+    
+    # Graficar puntos de datos
+    colors = ['red', 'blue', 'green', 'purple']
+    classes = ['Class 1', 'Class 2', 'Class 3', 'Class 4']
+    for i in range(Y.shape[0]):
+        plt.scatter(X[0, Y[i, :] == 1], X[1, Y[i, :] == 1], 
+                    color=colors[i], label=classes[i], alpha=0.7)
+
+    # Crear una malla para las regiones de decisión
+    xmin, xmax = np.min(X[0, :]) - 0.5, np.max(X[0, :]) + 0.5
+    ymin, ymax = np.min(X[1, :]) - 0.5, np.max(X[1, :]) + 0.5
+    xx, yy = np.meshgrid(np.linspace(xmin, xmax, 200),
+                         np.linspace(ymin, ymax, 200))
+    data = np.vstack([xx.ravel(), yy.ravel()])
+
+    # Predecir las probabilidades para cada punto en la malla
+    zz = net.predict(data)
+    zz = np.argmax(zz, axis=0)  # Clase con mayor probabilidad
+    zz = zz.reshape(xx.shape)
+
+    # Graficar las regiones de decisión
+    plt.contourf(xx, yy, zz, alpha=0.3, levels=len(classes)-1, 
+                 colors=colors, linestyles='dashed')
+
+    plt.xlim([xmin, xmax])
+    plt.ylim([ymin, ymax])
+    plt.xlabel('x1')
+    plt.ylabel('x2')
+    plt.title('One vs All con Softmax')
+    # plt.legend()
+    plt.grid(True)
+    plt.show()
+
+
 # Cargar dataset y entrenar
-df = pd.read_csv('Dataset_A05.csv')
+df = pd.read_csv('A06-OLNN/Dataset_A05.csv')
 X = np.array(df[['x1', 'x2']]).T
 Y = np.array(df[['y1', 'y2', 'y3', 'y4']]).T
 
 # Normalizar datos primero para mejor convergencia
 X_normalized = normalize_data(X)
 
-# Entrenar la red con parámetros optimizados
-net = OLN(n_inputs=2, n_output=4, activation_function=softmax)
+#----------------------------------------------------PARTE 1----------------------------------------------------
+# Entrenar la red con función logística (Multy Layer Classification) 
+net = OLN(n_inputs=2, n_output=4, activation_function=logistic)
 net.fit(X_normalized, Y, lr=0.1, epochs=5000)  # Parámetros ajustados
 
 # Visualizar resultados
 draw(X_normalized, Y, net)
+
+#----------------------------------------------------PARTE 2----------------------------------------------------
+# Entrenar la red con función softmax  (One vs All)
+
+# Entrenar la red
+net = OLN(n_inputs=2, n_output=4, activation_function=softmax)
+net.fit(X, Y, lr=0.1, epochs=10000)
+
+# Visualizar las regiones de decisión
+MLP_multiclass_draw(X, Y, net)
