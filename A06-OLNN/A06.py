@@ -23,6 +23,12 @@ def softmax(z, derivative=False):
         da = np.ones(z.shape)
         return a, da
     return a
+def sigmoid(z, derivative=False):
+    a = 1 / (1 + np.exp(-z))
+    if derivative:
+        da = a * (1 - a)
+        return a, da
+    return a
 
 class OLN:
     '''One Layer Neural Network'''
@@ -86,9 +92,7 @@ def draw(X, Y, net):
     plt.ylim([-0.02, 1.02])
     plt.xlabel('x1 ')
     plt.ylabel('x2 ')
-    plt.title('Clasificación Multiclase con Función Logística')
-    # plt.legend()
-    plt.grid(True)
+    plt.title('One vs All (logistic)')
     plt.show()
 
 
@@ -122,9 +126,7 @@ def MLP_multiclass_draw(X, Y, net):
     plt.ylim([ymin, ymax])
     plt.xlabel('x1')
     plt.ylabel('x2')
-    plt.title('One vs All con Softmax')
-    # plt.legend()
-    plt.grid(True)
+    plt.title('Softmax regression')
     plt.show()
 
 
@@ -138,7 +140,7 @@ X_normalized = normalize_data(X)
 
 #----------------------------------------------------PARTE 1----------------------------------------------------
 # Entrenar la red con función logística (Multy Layer Classification) 
-net = OLN(n_inputs=2, n_output=4, activation_function=logistic)
+net = OLN(n_inputs=2, n_output=4, activation_function=sigmoid)
 net.fit(X_normalized, Y, lr=0.1, epochs=5000)  # Parámetros ajustados
 
 # Visualizar resultados
